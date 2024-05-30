@@ -1,0 +1,95 @@
+-- Defina a GUI
+local player = game.Players.LocalPlayer
+local gui = Instance.new("ScreenGui")
+gui.Name = "SpeedControlGui"
+gui.Parent = player.PlayerGui
+
+-- Defina a caixa de texto
+local textBox = Instance.new("TextBox")
+textBox.Name = "SpeedTextBox"
+textBox.Size = UDim2.new(0, 200, 0, 30)
+textBox.Position = UDim2.new(0.5, -100, 0.5, -15)
+textBox.AnchorPoint = Vector2.new(0.5, 0.5)
+textBox.PlaceholderText = "Digite a velocidade"
+textBox.Parent = gui
+
+-- Defina o botão "Definir velocidade"
+local setSpeedButton = Instance.new("TextButton")
+setSpeedButton.Name = "SetSpeedButton"
+setSpeedButton.Size = UDim2.new(0, 200, 0, 30)
+setSpeedButton.Position = UDim2.new(0.5, -100, 0.5, 20)
+setSpeedButton.AnchorPoint = Vector2.new(0.5, 0)
+setSpeedButton.Text = "Definir velocidade"
+setSpeedButton.Parent = gui
+
+-- Defina o retângulo preto de fundo
+local background = Instance.new("Frame")
+background.Name = "Background"
+background.Size = UDim2.new(1, 0, 1, 0)
+background.BackgroundColor3 = Color3.new(0, 0, 0)
+background.BackgroundTransparency = 0.5
+background.Visible = true
+background.Parent = gui
+
+-- Defina os botões de minimizar e maximizar
+local minimizeButton = Instance.new("TextButton")
+minimizeButton.Name = "MinimizeButton"
+minimizeButton.Size = UDim2.new(0, 30, 0, 30)
+minimizeButton.Position = UDim2.new(1, -30, 1, -30)
+minimizeButton.AnchorPoint = Vector2.new(1, 1)
+minimizeButton.Text = "-"
+minimizeButton.Parent = background
+
+local maximizeButton = Instance.new("TextButton")
+maximizeButton.Name = "MaximizeButton"
+maximizeButton.Size = UDim2.new(0, 30, 0, 30)
+maximizeButton.Position = UDim2.new(1, -60, 1, -30)
+maximizeButton.AnchorPoint = Vector2.new(1, 1)
+maximizeButton.Text = "+"
+maximizeButton.Visible = false
+maximizeButton.Parent = background
+
+-- Lógica para definir a velocidade
+setSpeedButton.MouseButton1Click:Connect(function()
+    local speedText = textBox.Text
+    local speed = tonumber(speedText)
+    if speed then
+        player.Character.Humanoid.WalkSpeed = speed
+    else
+        warn("Digite um número válido para a velocidade.")
+    end
+end)
+
+-- Lógica para minimizar e maximizar
+minimizeButton.MouseButton1Click:Connect(function()
+    background.Visible = false
+    maximizeButton.Visible = true
+end)
+
+maximizeButton.MouseButton1Click:Connect(function()
+    background.Visible = true
+    maximizeButton.Visible = false
+end)
+
+-- Lógica para arrastar a interface
+local dragging = false
+local offset = Vector2.new()
+
+background.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        offset = input.Position - background.Position
+    end
+end)
+
+background.InputChanged:Connect(function(input)
+    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+        background.Position = UDim2.new(0, input.Position.X - offset.X, 0, input.Position.Y - offset.Y)
+    end
+end)
+
+background.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = false
+    end
+end)
